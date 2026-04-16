@@ -8,20 +8,29 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Use Gemini 2.5 Flash
-MODEL_NAME = "gemini-2.5-flash"
+# Use Gemini 2.5 Flash Lite as primary, fallback to Flash
+PRIMARY_MODEL = "gemini-2.5-flash-lite"
+FALLBACK_MODEL = "gemini-2.5-flash"
 
 def _get_client() -> genai.Client:
     return genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 def _generate(prompt: str) -> str:
-    """Single helper to call Gemini and return text."""
+    """Single helper to call Gemini and return text with fallback."""
     client = _get_client()
-    response = client.models.generate_content(
-        model=MODEL_NAME,
-        contents=prompt,
-    )
-    return response.text
+    try:
+        response = client.models.generate_content(
+            model=PRIMARY_MODEL,
+            contents=prompt,
+        )
+        return response.text
+    except Exception as e:
+        print(f"Primary model {PRIMARY_MODEL} failed ({e}), falling back to {FALLBACK_MODEL}...")
+        response = client.models.generate_content(
+            model=FALLBACK_MODEL,
+            contents=prompt,
+        )
+        return response.text
 
 def _clean_json(text: str) -> str:
     """Strip markdown code fences if Gemini wraps JSON in them."""
