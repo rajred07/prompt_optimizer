@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Settings, BarChart2, Zap, Scale, FileText, CheckCircle, AlertTriangle, Sparkles, Navigation } from 'lucide-react';
 import './index.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
